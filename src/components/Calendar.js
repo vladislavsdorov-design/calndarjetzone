@@ -3,11 +3,10 @@ import { rtdb } from "../firebase";
 import { ref, onValue } from "firebase/database";
 import DayShiftModal from "./DayShiftModal";
 
-export default function Calendar({ employees, isAuthorized }) {
+export default function Calendar({ employees, isAuthorized, tokenClient }) {
   const [selectedDate, setSelectedDate] = useState(null);
   const [shifts, setShifts] = useState([]);
 
-  // --- Загрузка смен из Firebase
   useEffect(() => {
     const shiftsRef = ref(rtdb, "shifts");
     const unsubscribe = onValue(shiftsRef, (snapshot) => {
@@ -73,6 +72,7 @@ export default function Calendar({ employees, isAuthorized }) {
           employees={employees}
           onClose={() => setSelectedDate(null)}
           isAuthorized={isAuthorized}
+          tokenClient={tokenClient}
         />
       )}
     </div>

@@ -177,6 +177,93 @@
 //     </div>
 //   );
 // }
+// import React, { useState, useEffect } from "react";
+// import AddEmployee from "./components/AddEmployee";
+// import EmployeesList from "./components/EmployeesList";
+// import Calendar from "./components/Calendar";
+// import { rtdb } from "./firebase";
+// import { ref, onValue } from "firebase/database";
+
+// const CLIENT_ID =
+//   "1068282317957-eulj4v3sm03pcl2vu5ub9cfu1shard5p.apps.googleusercontent.com";
+// const SCOPES = "https://www.googleapis.com/auth/calendar.events";
+
+// export default function App() {
+//   const [employees, setEmployees] = useState([]);
+//   const [gapiLoaded, setGapiLoaded] = useState(false);
+//   const [isAuthorized, setIsAuthorized] = useState(false);
+//   const [tokenClient, setTokenClient] = useState(null);
+
+//   // --- Загружаем GAPI
+//   useEffect(() => {
+//     window.gapi.load("client", async () => {
+//       await window.gapi.client.init({});
+//       await window.gapi.client.load("calendar", "v3");
+//       setGapiLoaded(true);
+//     });
+//   }, []);
+
+//   // --- Инициализация OAuth2 token client
+//   useEffect(() => {
+//     if (!gapiLoaded) return;
+
+//     const client = window.google.accounts.oauth2.initTokenClient({
+//       client_id: CLIENT_ID,
+//       scope: SCOPES,
+//       callback: (response) => {
+//         if (response.access_token) setIsAuthorized(true);
+//       },
+//     });
+
+//     setTokenClient(client);
+//   }, [gapiLoaded]);
+
+//   const login = () => tokenClient.requestAccessToken();
+//   const logout = () => {
+//     if (tokenClient) {
+//       window.google.accounts.oauth2.revoke(tokenClient.access_token, () => {
+//         setIsAuthorized(false);
+//       });
+//     }
+//   };
+
+//   // --- Firebase: загрузка сотрудников
+//   useEffect(() => {
+//     const employeesRef = ref(rtdb, "employees");
+//     const unsubscribe = onValue(employeesRef, (snapshot) => {
+//       const data = snapshot.val();
+//       if (data) {
+//         const list = Object.keys(data).map((key) => ({
+//           id: key,
+//           ...data[key],
+//         }));
+//         setEmployees(list);
+//       } else setEmployees([]);
+//     });
+//     return () => unsubscribe();
+//   }, []);
+
+//   return (
+//     <div style={{ padding: 20 }}>
+//       <h1>График сотрудников</h1>
+
+//       {!isAuthorized ? (
+//         <button onClick={login} style={{ marginBottom: 20 }}>
+//           Войти в Google Calendar
+//         </button>
+//       ) : (
+//         <button onClick={logout} style={{ marginBottom: 20 }}>
+//           Выйти из Google Calendar
+//         </button>
+//       )}
+
+//       <AddEmployee />
+//       <EmployeesList />
+//       <Calendar employees={employees} isAuthorized={isAuthorized} />
+//     </div>
+//   );
+// }
+// App.jsx
 import React, { useState, useEffect } from "react";
 import AddEmployee from "./components/AddEmployee";
 import EmployeesList from "./components/EmployeesList";
@@ -185,7 +272,7 @@ import { rtdb } from "./firebase";
 import { ref, onValue } from "firebase/database";
 
 const CLIENT_ID =
-  "1068282317957-eulj4v3sm03pcl2vu5ub9cfu1shard5p.apps.googleusercontent.com";
+  "1068282317957-eulj4v3sm03pcl2vu5ub9cfu1shard5p.apps.googleusercontent.com"; // Web Application Client ID
 const SCOPES = "https://www.googleapis.com/auth/calendar.events";
 
 export default function App() {
@@ -194,8 +281,9 @@ export default function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [tokenClient, setTokenClient] = useState(null);
 
-  // --- Загружаем GAPI
+  // --- Загрузка Google API
   useEffect(() => {
+    if (!window.gapi) return; // Ждём загрузки скрипта
     window.gapi.load("client", async () => {
       await window.gapi.client.init({});
       await window.gapi.client.load("calendar", "v3");
@@ -203,9 +291,9 @@ export default function App() {
     });
   }, []);
 
-  // --- Инициализация OAuth2 token client
+  // --- Инициализация OAuth token client
   useEffect(() => {
-    if (!gapiLoaded) return;
+    if (!gapiLoaded || !window.google?.accounts?.oauth2) return;
 
     const client = window.google.accounts.oauth2.initTokenClient({
       client_id: CLIENT_ID,
@@ -218,7 +306,10 @@ export default function App() {
     setTokenClient(client);
   }, [gapiLoaded]);
 
-  const login = () => tokenClient.requestAccessToken();
+  const login = () => {
+    if (tokenClient) tokenClient.requestAccessToken();
+  };
+
   const logout = () => {
     if (tokenClient) {
       window.google.accounts.oauth2.revoke(tokenClient.access_token, () => {
@@ -227,7 +318,7 @@ export default function App() {
     }
   };
 
-  // --- Firebase: загрузка сотрудников
+  // --- Загрузка сотрудников из Firebase Realtime Database
   useEffect(() => {
     const employeesRef = ref(rtdb, "employees");
     const unsubscribe = onValue(employeesRef, (snapshot) => {
@@ -238,7 +329,9 @@ export default function App() {
           ...data[key],
         }));
         setEmployees(list);
-      } else setEmployees([]);
+      } else {
+        setEmployees([]);
+      }
     });
     return () => unsubscribe();
   }, []);
@@ -247,7 +340,9 @@ export default function App() {
     <div style={{ padding: 20 }}>
       <h1>График сотрудников</h1>
 
-      {!isAuthorized ? (
+      {!gapiLoaded ? (
+        <div>Загрузка Google API...</div>
+      ) : !isAuthorized ? (
         <button onClick={login} style={{ marginBottom: 20 }}>
           Войти в Google Calendar
         </button>

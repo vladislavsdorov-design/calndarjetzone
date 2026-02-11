@@ -22,7 +22,12 @@ pids
 # Dependency directories
 node_modules/
 jspm_packages/
-
+# environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 # Optional npm cache directory
 .npm
 

@@ -252,7 +252,8 @@ export default function App() {
 
   const [stats, setStats] = useState({});
   const [selectedDate, setSelectedDate] = useState(null);
-  const [hoveredEvent, setHoveredEvent] = useState(null);
+  // const [hoveredEvent, setHoveredEvent] = useState(null);
+  // const [, setHoveredEvent] = useState(null);
 
   // ============= АВТОРИЗАЦИЯ =============
   useEffect(() => {

@@ -1,10 +1,9 @@
-# Google OAuth Secrets
-client_secret*.json
-*.json
-.env
-.env.local
-.env.development
-.env.production
+# Node modules
+node_modules/
+
+# Build output
+build/
+dist/
 
 # Logs
 logs
@@ -20,55 +19,34 @@ pids
 *.pid.lock
 
 # Dependency directories
-node_modules/
 jspm_packages/
-# environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+
 # Optional npm cache directory
 .npm
 
 # Optional eslint cache
 .eslintcache
 
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
+# dotenv environment variables
 .env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
 
-# next.js build output
-.next
+# Firebase local config
+firebase-debug.log
+.firebaserc
 
-# nuxt.js build output
-.nuxt
-
-# vuepress build output
-.vuepress/dist
-
-# Serverless directories
-.serverless/
-
-# FuseBox cache
-.fusebox/
-
-# DynamoDB Local files
-.dynamodb/
-
-# TernJS port file
-.tern-port
-
-# Mac
+# MacOS
 .DS_Store
 
 # Windows
 Thumbs.db
+
+# IDE / Editor settings (можно добавить свои)
+.vscode/
+.idea/
